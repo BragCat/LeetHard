@@ -17,7 +17,7 @@ public:
         return S.substr(suffix[index], lcp[index]);
     }
 private:
-    vector<int> buildSuffix(string s) {
+    vector<int> buildSuffix(string &s) {
         int n = s.length();
         vector<SuffixRanker> suffixRankers;
         for (int i = 0; i < n; ++i) {
