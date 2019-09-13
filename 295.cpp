@@ -1,53 +1,51 @@
 class MedianFinder {
 public:
     /** initialize your data structure here. */
-    MedianFinder() {  
+    MedianFinder() {
+        small_cnt = big_cnt = 0;
     }
     
     void addNum(int num) {
         double median = findMedian();
-        if (num < median) {
-            smaller.insert(num);
+        if (num <= median) {
+            small_nums.insert(num);
+            ++small_cnt;
         } else {
-            bigger.insert(num);
+            big_nums.insert(num);
+            ++big_cnt;
         }
-        adjustNumSet();
+        if (small_cnt < big_cnt) {
+            small_nums.insert(*big_nums.begin());
+            big_nums.erase(big_nums.begin());
+            ++small_cnt;
+            --big_cnt;
+        } else if (small_cnt > big_cnt + 1){
+            big_nums.insert(*small_nums.begin());
+            small_nums.erase(small_nums.begin());
+            --small_cnt;
+            ++big_cnt;
+        }
     }
     
     double findMedian() {
-        int size = smaller.size() + bigger.size();
-        if (size == 0) {
-            return MAX_INT;
-        }
-        if (size & 1) {
-            return *smaller.rbegin();
+        if (small_cnt > big_cnt) {
+            return *small_nums.begin();
+        } else if (small_cnt > 0) {
+            return (*small_nums.begin() + *big_nums.begin()) / 2.0;
         } else {
-            return static_cast<double>(*smaller.rbegin() + *bigger.begin()) / 2;
+            return MAX_INT;
         }
     }
 private:
     const int MAX_INT = ~0u >> 1;
-    multiset<int> smaller, bigger;
-    
-    void adjustNumSet() {
-        while (smaller.size() > bigger.size() + 1) {
-            int num = *smaller.rbegin();
-            auto it = smaller.end();
-            --it;
-            smaller.erase(it);
-            bigger.insert(num);
-        }
-        while (smaller.size() < bigger.size()) {
-            int num = *bigger.begin();
-            bigger.erase(bigger.begin());
-            smaller.insert(num);
-        }
-    }
+    multiset<int, greater<int>> small_nums;
+    multiset<int> big_nums;
+    int small_cnt, big_cnt;
 };
 
 /**
  * Your MedianFinder object will be instantiated and called as such:
- * MedianFinder obj = new MedianFinder();
- * obj.addNum(num);
- * double param_2 = obj.findMedian();
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
  */
